@@ -1,17 +1,18 @@
 from fastapi import FastAPI
 
+from app.api.v1.users import router as users_router
+from app.core.db import Base, engine
+
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Botfarm")
+    app = FastAPI(title="Botfarm users service")
+    Base.metadata.create_all(bind=engine)
 
-    @app.get("/")
-    def root():
+    @app.get("/health", tags=["service"])
+    def healthcheck():
         return {"status": "ok"}
 
-    @app.get("/health")
-    def health():
-        return {"status": "healthy"}
-
+    app.include_router(users_router, prefix="/api/v1")
     return app
 
 
